@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './transform.interceptor';
 async function bootstrap() {
-  const logger = new Logger();
+  const logger = new Logger('Main', { timestamp: true });
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(
     new ValidationPipe({

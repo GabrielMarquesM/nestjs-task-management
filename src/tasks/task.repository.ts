@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
@@ -10,6 +15,7 @@ import { Task } from './task.entity';
 
 @Injectable()
 export class TaskRepository {
+  private logger = new Logger('TaskRepository', { timestamp: true });
   constructor(
     @InjectRepository(Task)
     private readonly tasksRepository: Repository<Task>,
@@ -50,16 +56,25 @@ export class TaskRepository {
       status: status ? status : undefined,
     };
 
-    const tasks = this.tasksRepository.find({
-      where: [
-        { ...baseWhere, title: search ? ILike(`%${search}%`) : undefined },
-        {
-          ...baseWhere,
-          description: search ? ILike(`%${search}%`) : undefined,
-        },
-      ],
-    });
-    return tasks;
+    try {
+      const tasks = this.tasksRepository.find({
+        where: [
+          { ...baseWhere, title: search ? ILike(`%${search}%`) : undefined },
+          {
+            ...baseWhere,
+            description: search ? ILike(`%${search}%`) : undefined,
+          },
+        ],
+      });
+      return tasks;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get tasks for user "${
+          user.username
+        }. Filters ${JSON.stringify(filterDto)}"`,
+      );
+      throw new InternalServerErrorException();
+    }
   }
 
   async getAllTasks(user: User): Promise<Task[]> {
