@@ -32,9 +32,9 @@ export class TasksController {
   ): Promise<Task[]> {
     this.logger.verbose(`User "${user.username}": Retrieving all tasks"`);
     if (Object.keys(filterDto).length) {
+      this.logger.verbose(`Filters: ${JSON.stringify(filterDto)}"`);
       return this.tasksService.getTasksWithFilters(filterDto, user);
     } else {
-      this.logger.verbose(`Filters: ${JSON.stringify(filterDto)}"`);
       return this.tasksService.getAllTasks(user);
     }
   }
