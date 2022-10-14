@@ -1,6 +1,7 @@
 import * as Joi from '@hapi/joi';
 
 export const configValidationSchema = Joi.object({
+  PORT: Joi.number().default(3000),
   STAGE: Joi.required(),
   DB_HOST: Joi.required(),
   DB_PORT: Joi.number().default(5432),

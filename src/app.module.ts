@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { configValidationSchema } from './config.schema';
 import databaseConfig from './database.config';
+import deployConfig from './deploy.config';
 import { TasksModule } from './tasks/tasks.module';
 
 @Module({
@@ -16,16 +17,27 @@ import { TasksModule } from './tasks/tasks.module';
     TasksModule,
     AuthModule,
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule.forFeature(databaseConfig)],
-      inject: [databaseConfig.KEY],
+      imports: [
+        ConfigModule.forFeature(databaseConfig),
+        ConfigModule.forFeature(deployConfig),
+      ],
+      inject: [databaseConfig.KEY, deployConfig.KEY],
       useFactory: async (
         databaseConfiguration: ConfigType<typeof databaseConfig>,
-      ) => ({
-        type: 'postgres',
-        autoLoadEntities: true,
-        synchronize: true,
-        url: databaseConfiguration.DB_URL,
-      }),
+        deployConfiguration: ConfigType<typeof deployConfig>,
+      ) => {
+        const isProduction = deployConfiguration.STAGE == 'prod';
+        return {
+          ssl: isProduction,
+          extra: {
+            ssl: isProduction ? { rejectUnauthorized: false } : null,
+          },
+          type: 'postgres',
+          autoLoadEntities: true,
+          synchronize: true,
+          url: databaseConfiguration.DB_URL,
+        };
+      },
     }),
   ],
 })
