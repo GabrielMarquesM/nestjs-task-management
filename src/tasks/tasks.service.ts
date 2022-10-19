@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/auth/user.entity';
+import { User } from '../auth/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateTaskDto } from './dto/update-task-status.dto';
@@ -10,15 +10,8 @@ import { TaskRepository } from './task.repository';
 export class TasksService {
   constructor(private readonly tasksRepository: TaskRepository) {}
 
-  getAllTasks(user: User): Promise<Task[]> {
-    return this.tasksRepository.getAllTasks(user);
-  }
-
-  getTasksWithFilters(
-    filterDto: GetTasksFilterDto,
-    user: User,
-  ): Promise<Task[]> {
-    return this.tasksRepository.getTasksWithFilters(filterDto, user);
+  getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
+    return this.tasksRepository.getTasks(filterDto, user);
   }
 
   getTask(id: string, user: User): Promise<Task> {

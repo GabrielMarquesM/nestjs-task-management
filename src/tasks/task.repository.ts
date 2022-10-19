@@ -1,12 +1,7 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/auth/user.entity';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
+import { User } from '../auth/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateTaskDto } from './dto/update-task-status.dto';
@@ -45,10 +40,7 @@ export class TaskRepository {
     return found;
   }
 
-  async getTasksWithFilters(
-    filterDto: GetTasksFilterDto,
-    user: User,
-  ): Promise<Task[]> {
+  async getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
     const { status, search } = filterDto;
 
     const baseWhere: FindOptionsWhere<Task> = {
@@ -56,29 +48,16 @@ export class TaskRepository {
       status: status ? status : undefined,
     };
 
-    try {
-      const tasks = this.tasksRepository.find({
-        where: [
-          { ...baseWhere, title: search ? ILike(`%${search}%`) : undefined },
-          {
-            ...baseWhere,
-            description: search ? ILike(`%${search}%`) : undefined,
-          },
-        ],
-      });
-      return tasks;
-    } catch (error) {
-      this.logger.error(
-        `Failed to get tasks for user "${
-          user.username
-        }. Filters ${JSON.stringify(filterDto)}"`,
-      );
-      throw new InternalServerErrorException();
-    }
-  }
-
-  async getAllTasks(user: User): Promise<Task[]> {
-    return this.tasksRepository.findBy({ user: { id: user.id } });
+    const tasks = this.tasksRepository.find({
+      where: [
+        { ...baseWhere, title: search ? ILike(`%${search}%`) : undefined },
+        {
+          ...baseWhere,
+          description: search ? ILike(`%${search}%`) : undefined,
+        },
+      ],
+    });
+    return tasks;
   }
 
   async updateTask(
