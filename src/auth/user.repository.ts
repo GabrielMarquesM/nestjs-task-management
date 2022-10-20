@@ -37,11 +37,23 @@ export class UsersRepository {
       }
     }
   }
+
+  async remove(id: string): Promise<void> {
+    const result = await this.usersRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+  }
+
   async findOne(username: string): Promise<User> {
     const found = await this.usersRepository.findOneBy({ username });
     if (!found) {
       throw new NotFoundException(`User ${username} not found`);
     }
     return found;
+  }
+
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.find();
   }
 }
