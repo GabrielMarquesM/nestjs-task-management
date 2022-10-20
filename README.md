@@ -1,6 +1,6 @@
 # Task Management System
 
-Task Management application in Node.js using Typescript, Nest.js framework, JWT authentication Jest for unit testing.
+Task Management application using Node.js with Typescript, Nest.js framework, JWT authentication and Jest for unit testing.
 
 ## How to start
 

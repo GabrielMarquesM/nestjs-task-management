@@ -1,36 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../auth/user.entity';
+import { User } from '../auth/entities/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
-import { UpdateTaskDto } from './dto/update-task-status.dto';
-import { Task } from './task.entity';
+import { FindTaskDto } from './dto/find-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { Task } from './entities/task.entity';
 import { TaskRepository } from './task.repository';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly tasksRepository: TaskRepository) {}
 
-  getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
-    return this.tasksRepository.getTasks(filterDto, user);
+  create(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
+    return this.tasksRepository.create(createTaskDto, user);
   }
 
-  getTask(id: string, user: User): Promise<Task> {
-    return this.tasksRepository.getTask(id, user);
+  findAll(filterDto: FindTaskDto, user: User): Promise<Task[]> {
+    return this.tasksRepository.findAll(filterDto, user);
   }
 
-  createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
-    return this.tasksRepository.createTask(createTaskDto, user);
+  findOne(id: string, user: User): Promise<Task> {
+    return this.tasksRepository.findOne(id, user);
   }
 
-  deleteTask(id: string, user: User): Promise<void> {
-    return this.tasksRepository.deleteTask(id, user);
+  update(id: string, updateTaskDto: UpdateTaskDto, user: User): Promise<Task> {
+    return this.tasksRepository.update(id, updateTaskDto, user);
   }
 
-  updateTask(
-    id: string,
-    updateTaskDto: UpdateTaskDto,
-    user: User,
-  ): Promise<Task> {
-    return this.tasksRepository.updateTask(id, updateTaskDto, user);
+  remove(id: string, user: User): Promise<void> {
+    return this.tasksRepository.remove(id, user);
   }
 }

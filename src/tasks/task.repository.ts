@@ -1,22 +1,21 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
-import { User } from '../auth/user.entity';
+import { User } from '../auth/entities/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
-import { UpdateTaskDto } from './dto/update-task-status.dto';
+import { FindTaskDto } from './dto/find-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { Task } from './entities/task.entity';
 import { TaskStatus } from './task-status.enum';
-import { Task } from './task.entity';
 
 @Injectable()
 export class TaskRepository {
-  private logger = new Logger('TaskRepository', { timestamp: true });
   constructor(
     @InjectRepository(Task)
     private readonly tasksRepository: Repository<Task>,
   ) {}
 
-  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
+  async create(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     const task = this.tasksRepository.create({
       ...createTaskDto,
       status: TaskStatus.OPEN,
@@ -25,14 +24,14 @@ export class TaskRepository {
     return this.tasksRepository.save(task);
   }
 
-  async deleteTask(id: string, user: User): Promise<void> {
+  async remove(id: string, user: User): Promise<void> {
     const result = await this.tasksRepository.delete({ id, user });
     if (!result.affected) {
       throw new NotFoundException(`Task ${id} not found`);
     }
   }
 
-  async getTask(id: string, user: User): Promise<Task> {
+  async findOne(id: string, user: User): Promise<Task> {
     const found = await this.tasksRepository.findOneBy({ id, user });
     if (!found) {
       throw new NotFoundException(`Task ${id} not found`);
@@ -40,7 +39,7 @@ export class TaskRepository {
     return found;
   }
 
-  async getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
+  async findAll(filterDto: FindTaskDto, user: User): Promise<Task[]> {
     const { status, search } = filterDto;
 
     const baseWhere: FindOptionsWhere<Task> = {
@@ -60,12 +59,12 @@ export class TaskRepository {
     return tasks;
   }
 
-  async updateTask(
+  async update(
     id: string,
     updateTaskDto: UpdateTaskDto,
     user: User,
   ): Promise<Task> {
-    const isUserTask = await this.getTask(id, user);
+    const isUserTask = await this.findOne(id, user);
     if (!isUserTask) {
       throw new NotFoundException(`Task ${id} not found`);
     }

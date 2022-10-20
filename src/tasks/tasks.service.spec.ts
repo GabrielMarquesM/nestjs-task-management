@@ -36,21 +36,15 @@ describe('TasksService', () => {
   describe('getTasks', () => {
     it('calls TasksRepository.getTasks and returns the result', async () => {
       tasksRepository.getTasks.mockResolvedValue('someValue');
-      const result = await tasksService.getTasks(null, mockUser);
+      const result = await tasksService.findAll(null, mockUser);
       expect(result).toEqual('someValue');
     });
   });
   describe('getTask', () => {
     it('calls TaskRepository.getTask and returns the result', async () => {
       tasksRepository.getTask.mockResolvedValue(mockTask);
-      const result = await tasksService.getTask('testId', mockUser);
+      const result = await tasksService.findOne('testId', mockUser);
       expect(result).toEqual(mockTask);
     });
-    //   it('calls TasksRepository.getTask and handles an error', async () => {
-    //     tasksRepository.getTask.mockResolvedValue(null);
-    //     expect(tasksService.getTask('testId', mockUser)).rejects.toThrow(
-    //       NotFoundException,
-    //     );
-    //   });
   });
 });

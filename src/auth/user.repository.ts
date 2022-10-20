@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersRepository {
@@ -16,7 +16,7 @@ export class UsersRepository {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
-  async createUser(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  async create(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { username, password } = authCredentialsDto;
 
     const saltRounds = 10;
@@ -37,7 +37,7 @@ export class UsersRepository {
       }
     }
   }
-  async getUser(username: string): Promise<User> {
+  async findOne(username: string): Promise<User> {
     const found = await this.usersRepository.findOneBy({ username });
     if (!found) {
       throw new NotFoundException(`User ${username} not found`);
