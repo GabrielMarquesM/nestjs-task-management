@@ -5,4 +5,3 @@ Task Management application using Node.js with Typescript, Nest.js framework, JW
 ## How to start
 
 - `yarn start:dev `(Local Application)
-- [Heroku](https://task-management-gabrielm.herokuapp.com/tasks) (Cloud Application)
